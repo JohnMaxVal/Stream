@@ -43,3 +43,20 @@ serialize_data(ser_buf_t* buf, char *data, uint32 size) {
   memcpy((char*)buf->b + buf->pos, data, size);
   buf->pos += size;
 }
+
+void
+deserialize_data(char *dest, ser_buf_t* buf, uint32 sz) {
+  if(buf == NULL)
+    return;
+  else if(dest == NULL)
+    return;
+  else if(sz == 0 || (buf->sz - buf->pos) < sz)
+    return;
+  memcpy(dest, (char *)buf->b + buf->pos, sz);
+  buf->pos += sz;
+}
+
+uint32
+is_buf_empty(ser_buff_t* b) {
+  return b->sz == 0 ?  : 0;
+}

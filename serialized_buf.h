@@ -25,4 +25,7 @@ serialize_data(ser_buf_t* buf, char *data, uint32 nbytes);
 void
 deserialize_data(char *dest, ser_buf_t* buf, uint32 sz);
 
+uint32
+is_buf_empty(ser_buff_t* b);
+
 #endif
