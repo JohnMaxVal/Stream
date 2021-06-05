@@ -5,8 +5,8 @@
 void
 init_serialized_buf(ser_buf_t** buf) {
   *buf = (ser_buf_t *)malloc(sizeof(ser_buf_t));
-  (*buf)->b = (char *)calloc(SERIALIZE_BUFFER_DEFAULT_SIZE, sizeof(char));
-  (*buf)->sz = 0;
+  (*buf)->b = (char *)malloc(SERIALIZE_BUFFER_DEFAULT_SIZE * sizeof(char));
+  (*buf)->sz = SERIALIZE_BUFFER_DEFAULT_SIZE;
   (*buf)->pos = 0;
   (*buf)->checkpoint = 0;
 }
@@ -14,8 +14,8 @@ init_serialized_buf(ser_buf_t** buf) {
 void
 init_serialized_buffer_of_defined_size(ser_buf_t** buf, uint32 size) {
   *buf = (ser_buf_t *)malloc(sizeof(ser_buf_t));
-  (*buf)->b = (char *)calloc(size, sizeof(char));
-  (*buf)->sz = 0;
+  (*buf)->b = (char *)malloc(size * sizeof(char));
+  (*buf)->sz = size;
   (*buf)->pos = 0;
   (*buf)->checkpoint = 0;  
 }
@@ -77,5 +77,5 @@ cpy_to_buf_by_offset(ser_buf_t* b,
   if(b->sz < offset || available_sp < size)
     return;
 
-  memcpy((char*)b->b + offset, value, size);
+  memcpy(b->b + offset, value, size);
 }
