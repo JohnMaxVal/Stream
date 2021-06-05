@@ -17,7 +17,7 @@ void
 init_serialized_buf(ser_buf_t** buf);
 
 void
-init_serialized_buffer_of_defined_size(ser_buff_t** b, int size);
+init_serialized_buffer_of_defined_size(ser_buf_t** b, uint32 size);
 
 void
 serialize_data(ser_buf_t* buf, char *data, uint32 nbytes);
