@@ -2,6 +2,17 @@
 #include <stdlib.h>
 #include <memory.h>
 
+/* static uint32 */
+/* get_ser_buf_available_space(ser_buf_t* b) { */
+/*   return b->sz - b->pos; */
+/* } */
+
+static int
+is_enough_space(ser_buf_t* b, int size) {
+  int sign = size >= 0 ? 1 : -1;
+  return (b->sz - b->pos) > (sign * size);
+}
+
 void
 init_serialized_buf(ser_buf_t** buf) {
   *buf = (ser_buf_t *)malloc(sizeof(ser_buf_t));
@@ -24,20 +35,14 @@ void
 serialize_data(ser_buf_t* buf, char *data, uint32 size) {
   if(!data || !size) return;
 
-  uint32 free_space = buf->sz - buf->pos;
-  char isResize = 0;
-
-  while(free_space < size) { // if not enough memory then double space
-    buf->sz = buf->sz * 2;
-    free_space = buf->sz - buf->pos;
-    isResize = 0;
-  }
-
-  if(!isResize) {
+  if(is_enough_space(buf, size)) {
     memcpy((char*)buf->b + buf->pos, data, size);
     buf->pos += size;
     return;
   }
+
+  while(!is_enough_space(buf, size)) // if not enough memory then double space
+    buf->sz = buf->sz * 2;
 
   buf->b = (char*)realloc(buf->b, buf->sz);
   memcpy((char*)buf->b + buf->pos, data, size);
@@ -72,10 +77,49 @@ cpy_to_buf_by_offset(ser_buf_t* b,
 		     uint32 size,
 		     char *value,
 		     uint32 offset) {
-  uint32 available_sp = b->sz - b->pos;
-
-  if(b->sz < offset || available_sp < size)
+  if(b->sz < offset || !is_enough_space(b, size))
     return;
 
   memcpy(b->b + offset, value, size);
+}
+
+void
+mark_checkpoint_ser_buf(ser_buf_t* b) {
+  if(b == NULL) return;
+  b->checkpoint = b->pos;
+}
+
+uint32
+get_ser_buf_checkpoint_by_offset(ser_buf_t* b) {
+  return b->checkpoint;
+}
+
+void
+ser_buf_skip(ser_buf_t* b, int skip_sz) {
+  if(b == NULL) return;
+  
+  if(is_enough_space(b, skip_sz)) {
+    b->pos += skip_sz;
+    return;
+  }
+
+  while(!is_enough_space(b, skip_sz)) {
+    b->sz = b->sz * 2;
+  }
+
+  b->b = (char*)realloc(b->b, b->sz);
+  b->pos += skip_sz;
+}
+
+void
+free_ser_buf(ser_buf_t* b) {
+  if(b == NULL)
+    return;
+
+  if(b->b != NULL)
+    free(b->b);
+  b->sz = 0;
+  b->pos = 0;
+  b->checkpoint = 0;
+  free(b);
 }
