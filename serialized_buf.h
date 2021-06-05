@@ -26,6 +26,6 @@ void
 deserialize_data(char *dest, ser_buf_t* buf, uint32 sz);
 
 uint32
-is_buf_empty(ser_buff_t* b);
+is_buf_empty(ser_buf_t* b);
 
 #endif
