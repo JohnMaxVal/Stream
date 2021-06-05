@@ -58,5 +58,24 @@ deserialize_data(char *dest, ser_buf_t* buf, uint32 sz) {
 
 uint32
 is_buf_empty(ser_buf_t* b) {
-  return b->sz == 0 ?  : 0;
+  return b->sz == 0 ? 1 : 0;
+}
+
+/*
+  For example, the below call must copy the string "csepracticals.com" in a serialize buffer at byte location 32th from the beginning of serialize buffer. The the API is not supposed to update b->next or b->size variables of the serialize buffer.
+
+  copy_in_serialized_buffer_by_offset(ser_bff, 64, "csepracticals.com", 32);
+ */
+
+void
+cpy_to_buf_by_offset(ser_buf_t* b,
+		     uint32 size,
+		     char *value,
+		     uint32 offset) {
+  uint32 available_sp = b->sz - b->pos;
+
+  if(b->sz < offset || available_sp < size)
+    return;
+
+  memcpy((char*)b->b + offset, value, size);
 }
